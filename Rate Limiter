@@ -1,0 +1,64 @@
+class Queue {
+    constructor() {
+        this.data = {};
+        this.front = 0;
+        this.back = 0;
+    }
+
+    add(val) {
+        this.data[this.back++] = val;
+    }
+
+    remove() {
+        const val = this.data[this.front];
+        delete this.data[this.front++];
+        return val;
+    }
+
+    peek() {
+        return this.data[this.front];
+    }
+
+    size() {
+        return this.back - this.front;
+    }
+
+    isEmpty() {
+        return this.size() === 0;
+    }
+}
+
+class SlidingWindowRateLimiter {
+    constructor(limits, seconds) {
+        this.limits = limits;
+        this.windowMs = seconds * 1000;
+        this.userRequests = new Map();
+    }
+
+    allowRequest(user) {
+        const now = Date.now();
+        const startTime = now - this.windowMs;
+
+        let q = this.userRequests.get(user);
+        if (!q) {
+            q = new Queue();
+            this.userRequests.set(user, q);
+        }
+
+        while (!q.isEmpty() && q.peek() <= startTime) {
+            q.remove();
+        }
+
+        if (q.size() >= this.limits) return false;
+
+        q.add(now);
+        return true;
+    }
+}
+
+
+const limiter = new SlidingWindowRateLimiter(3, 60);
+const userId = "user123";
+for (let i = 0; i < 6; i++) {
+    console.log(limiter.allowRequest(userId));
+}
