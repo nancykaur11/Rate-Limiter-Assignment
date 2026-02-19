@@ -57,8 +57,9 @@ class SlidingWindowRateLimiter {
 }
 
 
-const limiter = new SlidingWindowRateLimiter(3, 60);
+const limiter = new SlidingWindowRateLimiter(5, 60);
 const userId = "user123";
 for (let i = 0; i < 6; i++) {
     console.log(limiter.allowRequest(userId));
 }
+
